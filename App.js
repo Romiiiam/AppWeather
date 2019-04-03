@@ -73,15 +73,6 @@ export default class App extends React.Component {
    this.setState({appState: nextAppState});
  };
 
-  search = () =>{
-    console.log(this.state.value);
-  }
-
-  changeHandler = (e) =>{
-    let value= e.target.value;
-    console.log(value);
-  }
-
   render() {
     const { isLoading, weatherCondition, temperature, town } = this.state;
     const temp = Math.round(this.state.temperature);
