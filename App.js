@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Animated, Image, Text, AppState } from 'react-native';
-
+import { StyleSheet, View, Animated, Image, Text, AppState, TextInput, Button } from 'react-native';
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
 import { API_KEY } from './utils/WeatherAPIKey';
 
 import Weather from './components/Weather';
@@ -11,8 +12,10 @@ export default class App extends React.Component {
     temperature: 0,
     weatherCondition: null,
     appState: AppState.currentState,
-    error: null
+    error: null,
+    value: ""
   };
+
 
   componentDidMount() {
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -50,10 +53,13 @@ export default class App extends React.Component {
       });
   }
 
-  _refresh() {
+  _handleAppStateChange = (nextAppState) => {
+   if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
     navigator.geolocation.getCurrentPosition(
       position => {
-          this.fetchWeather(position.coords.latitude, position.coords.longitude);
+        this.interval = setInterval(() => {
+          this.fetchWeather(position.coords.latitude, position.coords.longitude)
+        }, 5000);
       },
       error => {
         this.setState({
@@ -61,44 +67,35 @@ export default class App extends React.Component {
         });
       }
     );
-  }
-
-  _handleAppStateChange = (nextAppState) => {
-   if (
-     this.state.appState.match(/inactive|background/) &&
-     nextAppState === 'active'
-   ) {
-    console.log('De retour sur l application');
-     position => {
-       this.interval = setInterval(() => {
-         this.fetchWeather(position.coords.latitude, position.coords.longitude)
-       }, 500);
-     },
-     error => {
-       this.setState({
-         error: 'Error Getting Weather Condtions'
-       });
-     }
    } else {
      clearInterval(this.interval);
-     console.log('Vous avez quitté l application!');
    }
    this.setState({appState: nextAppState});
  };
 
+  search = () =>{
+    console.log(this.state.value);
+  }
+
+  changeHandler = (e) =>{
+    let value= e.target.value;
+    console.log(value);
+  }
+
   render() {
     const { isLoading, weatherCondition, temperature, town } = this.state;
+    const temp = Math.round(this.state.temperature);
     return (
       <View style={{flex: 1}}>
         <View style={styles.container}>
           {isLoading ? (
             <View style={styles.loadingContainer}>
-            <Image
-               style={{width: 300, height: 200}}
-               source={{uri: 'https://i.pinimg.com/originals/ea/ed/af/eaedaf4b07d22cbb239d4d47b5613c63.gif'}} />
+              <Image
+                 style={{width: 300, height: 200}}
+                 source={{uri: 'https://i.pinimg.com/originals/ea/ed/af/eaedaf4b07d22cbb239d4d47b5613c63.gif'}} />
             </View>
           ) : (
-            <Weather weather={weatherCondition} town={town} temperature={temperature} />
+              <Weather weather={weatherCondition} town={town} temperature={temp} />
           )}
         </View>
       </View>
