@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TextInput, Button, Alert, Keyboard } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import { weatherConditions } from '../utils/WeatherConditions';
@@ -23,7 +23,6 @@ export default class Weather extends React.Component {
     )
       .then(res => res.json())
       .then(json => {
-        console.log("--------------------");
         let new_val = Math.round(json.list[0].main.temp - 273.15) ;
         this.setState({
           temperature: new_val,
@@ -34,6 +33,17 @@ export default class Weather extends React.Component {
         console.log(this.state);
       });
   }
+
+  Hide_Soft_Keyboard=()=>{
+
+    Keyboard.dismiss();
+
+  }
+
+  functionCombined() {
+    this._onPressButton();
+    this.Hide_Soft_Keyboard();
+}
 
 render(){
   return (
@@ -46,17 +56,17 @@ render(){
       <ImageBackground
         style={{width: '100%', height: '100%'}}
         source={{uri: weatherConditions[this.state.weather].img}}>
-      <View style={{marginTop: 80 ,flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'space-around'}}>
-        <Text>Search by location </Text>
+      <View style={{marginTop: 10 ,flex: 1,flexDirection: 'row',alignItems: 'center',justifyContent: 'space-around'}}>
         <TextInput
-          style={{width : 200,height:50, borderColor: 'gray', borderWidth: 1, borderRadius: 10,backgroundColor: 'white'}}
+          style={{width : '60%',height:40, paddingLeft:10, borderColor: 'gray', borderWidth: 1, borderRadius: 10, backgroundColor: 'rgba(255, 255, 255, 0.5)'}}
           onChangeText={(value) => this.setState({value})}
           value={this.state.value}
         />
         <Button
-          onPress={() => this._onPressButton()}
-          title="go"
-          color="#841584"
+
+          onPress={() => this.functionCombined()}
+          title="Recherche"
+          style={styles.buttonStyle}
         />
       </View>
       <View style={styles.headerContainer}>
@@ -88,6 +98,12 @@ Weather.propTypes = {
 const styles = StyleSheet.create({
   weatherContainer: {
     flex: 1
+  },
+  buttonStyle: {
+    color: 'red',
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: 'green'
   },
   headerContainer: {
     flex: 1,
